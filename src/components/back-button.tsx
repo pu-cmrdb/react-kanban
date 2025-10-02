@@ -3,18 +3,18 @@
 import { ArrowLeftIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
+import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
 
-interface BackButtonProps {
-  className?: string;
-}
-
-export function BackButton({ className }: BackButtonProps) {
+export function BackButton({ className, ...props }: React.ComponentProps<typeof Link>) {
   const router = useRouter();
 
   return (
     <Button variant="outline" size="icon" onClick={() => router.back()} className={className}>
-      <ArrowLeftIcon />
+      <Link {...props}>
+        <ArrowLeftIcon />
+      </Link>
     </Button>
   );
 };

@@ -34,9 +34,9 @@ export default function IssuePage() {
   // 直接顯示議題的完整資訊，不需要檢查 issue 是否存在
   return (
     <div className="w-3xl mx-auto p-16 space-y-4">
-      {/* 標題區域，包含返回按鈕 */}
+      {/* 標題和返回按鈕 */}
       <h1 className="relative flex items-center gap-2 text-3xl font-bold">
-        <BackButton className="absolute -left-4 -translate-x-full" />
+        <BackButton href="/" className="absolute -left-4 -translate-x-full" />
         <span>{issue.title}</span>
       </h1>
 

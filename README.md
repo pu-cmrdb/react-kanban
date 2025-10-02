@@ -6,29 +6,30 @@
 
 1. **安裝依賴套件**
 
-```bash
-bun install
-```
+   ```bash
+   bun install
+   ```
 
 2. **啟動開發伺服器**
 
-```bash
-bun dev
-```
+   ```bash
+   bun dev
+   ```
 
 3. **開啟瀏覽器**
-
-前往 [http://localhost:3000](http://localhost:3000) 查看結果
+   前往 [http://localhost:3000](http://localhost:3000) 查看結果
 
 ## 專案結構
 
-```
+```md
 react-kanban/
 ├── src/
 │   ├── app/                          # Next.js App Router 頁面
 │   │   ├── layout.tsx                # 根 Layout，初始化全域狀態
 │   │   ├── page.tsx                  # 首頁（看板介面）
 │   │   ├── issues/
+│   │   │   ├── create/
+│   │   │   │   └── page.tsx          # 建立議題頁面
 │   │   │   └── [id]/
 │   │   │       ├── layout.tsx        # 議題詳細頁 Layout
 │   │   │       └── page.tsx          # 議題詳細頁
@@ -52,7 +53,7 @@ react-kanban/
 
 ### 1. Server Component vs Client Component
 
-```typescript
+```tsx
 // ✅ Server Component（預設）
 // src/app/layout.tsx
 export default function RootLayout({ children }) {
@@ -73,7 +74,7 @@ export function IssueProvider({ children, initialIssues }) {
 
 Layout 會包住它底下的所有路由和元件：
 
-```
+```md
 /app/layout.tsx (根 Layout)
   └─ 提供 IssueProvider 給整個應用程式
 
@@ -87,7 +88,7 @@ Layout 會包住它底下的所有路由和元件：
 
 這個專案使用雙層 Provider 架構：
 
-```
+```md
 <IssueProvider>                    # 全域狀態，管理所有議題
   ├─ 首頁看板
   └─ <IssueDetailProvider>         # 單一議題狀態，包裝全域方法
@@ -104,7 +105,7 @@ Layout 會包住它底下的所有路由和元件：
 
 簡單來說：外層管理「全部」，內層管理「單一」並確保型別安全
 
-```typescript
+```tsx
 // 在首頁看板（使用全域 Provider）
 const { patchIssue } = useIssue();
 await patchIssue('issue-1', { status: 'done' }); // 需要傳 id
@@ -234,6 +235,7 @@ Host: localhost:3000
    - **Context API 的使用**：透過 `createContext` 和 `useContext` 在元件樹中共享狀態，避免 props drilling（逐層傳遞）
    - **Provider 設計模式**：將狀態邏輯封裝在 Provider 元件中，提供清晰的 API 給子元件使用，實現關注點分離
    - **自訂 Hooks**：將可重用的邏輯抽取成 `useIssue`、`useIssueDetail` 等自訂 hooks，讓元件程式碼更簡潔
+   - **表單處理**：使用 `useState` 管理表單欄位、`event.preventDefault()` 防止預設行為、try-catch 錯誤處理
 
 3. **TypeScript**
    - **介面定義（Interface）**：定義 `Issue` 介面描述資料結構，讓 IDE 提供自動完成與型別檢查
@@ -271,6 +273,7 @@ Host: localhost:3000
 5. **研究頁面結構**
    - [src/app/layout.tsx](src/app/layout.tsx) - 根 Layout，資料初始化
    - [src/app/page.tsx](src/app/page.tsx) - 首頁看板
+   - [src/app/issues/create/page.tsx](src/app/issues/create/page.tsx) - 建立議題頁面（表單處理、錯誤處理）
    - [src/app/issues/[id]/layout.tsx](src/app/issues/[id]/layout.tsx) - 議題詳細 Layout
    - [src/app/issues/[id]/page.tsx](src/app/issues/[id]/page.tsx) - 議題詳細頁
 
