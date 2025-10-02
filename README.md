@@ -1,6 +1,6 @@
 # React Kanban 看板系統
 
-這是一個 Next.js 15 的一個簡單的看板系統（Kanban Board），用來展示現代 React 開發的核心概念與最佳實踐。
+一個 Next.js 15 的一個簡單的看板系統（Kanban Board），用來展示現代 React 開發的核心概念與最佳實踐。
 
 ## 快速開始
 
