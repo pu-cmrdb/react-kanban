@@ -26,7 +26,11 @@ export function IssueCard({ issue }: IssueCardProps) {
 
   return (
     <Card
-      className="cursor-pointer hover:scale-102 active:scale-98 hover:shadow-md active:shadow-none"
+      className={`
+        cursor-pointer
+        hover:scale-102 hover:shadow-md
+        active:scale-98 active:shadow-none
+      `}
       onClick={() => router.push(`/issues/${issue.id}`)}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}

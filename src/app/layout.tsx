@@ -59,13 +59,13 @@ export default function RootLayout({
   const initialIssues = storage.getAll();
 
   return (
-    <html lang="zh-TW">
+    <html lang="zh-TW" className={notoSansTC.variable}>
       <body
-        className={`${notoSansTC.variable} antialiased bg-muted`}
+        className="grid w-dvw bg-muted antialiased"
       >
         {/* 把初始資料傳給 IssueProvider */}
         <IssueProvider initialIssues={initialIssues}>
-          <main className="w-svw">{children}</main>
+          {children}
         </IssueProvider>
       </body>
     </html>

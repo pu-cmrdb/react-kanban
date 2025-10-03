@@ -11,7 +11,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
     doing: 'bg-amber-500/10 text-amber-500 border-amber-500',
     done: 'bg-green-500/10 text-green-500 border-green-500',
     closed: 'bg-gray-500/10 text-gray-500 border-gray-500',
-  }[status] ?? 'bg-gray-500/10 text-gray-500 border-gray-500';
+  }[status] ?? 'border-gray-500 bg-gray-500/10 text-gray-500';
 
   const label = {
     todo: '📝 還沒做',

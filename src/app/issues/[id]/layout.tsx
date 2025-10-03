@@ -75,7 +75,7 @@ export default function IssueDetailLayout({
   // 提前返回：如果議題不存在，直接顯示錯誤訊息
   if (!issue) {
     return (
-      <div className="w-3xl mx-auto p-16 space-y-4">
+      <div className="mx-auto w-3xl space-y-4 p-16">
         <h1 className="text-3xl font-bold">找不到議題</h1>
         <p className="text-muted-foreground">
           這個議題可能已經被刪除，或是 ID 不正確。

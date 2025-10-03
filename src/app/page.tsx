@@ -45,26 +45,26 @@ export default function Home() {
       </div>
 
       {/* 看板主體 - 四個狀態欄位 */}
-      <div className="grid grid-cols-4 items-start gap-4">
+      <div className="grid min-h-0 grid-cols-4 items-start gap-4">
         <StatusColumn
           title="📝 還沒做"
           status="todo"
-          className="bg-sky-50 border-sky-300"
+          className="border-sky-300 bg-sky-50"
         />
         <StatusColumn
           title="🚧 正在做"
           status="doing"
-          className="bg-amber-50 border-amber-300"
+          className="border-amber-300 bg-amber-50"
         />
         <StatusColumn
           title="✅ 做完ㄌ"
           status="done"
-          className="bg-green-50 border-green-300"
+          className="border-green-300 bg-green-50"
         />
         <StatusColumn
           title="📦 放棄"
           status="closed"
-          className="bg-gray-50 border-gray-300"
+          className="border-gray-300 bg-gray-50"
         />
       </div>
 

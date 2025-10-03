@@ -76,10 +76,13 @@ export default function IssueEditPage() {
   };
 
   return (
-    <div className="w-3xl mx-auto p-16 space-y-8">
+    <div className="mx-auto w-3xl space-y-8 p-16">
       {/* 標題和返回按鈕 */}
       <h1 className="relative flex items-center gap-2 text-3xl font-bold">
-        <BackButton href={`/issues/${issue.id}`} className="absolute -left-4 -translate-x-full" />
+        <BackButton
+          href={`/issues/${issue.id}`}
+          className="absolute -left-4 -translate-x-full"
+        />
         <span>編輯議題</span>
       </h1>
 
@@ -112,7 +115,7 @@ export default function IssueEditPage() {
           <Label htmlFor="status">狀態*</Label>
           {/* Select 是 shadcn/ui 提供的下拉選單元件 */}
           <Select value={status} onValueChange={setStatus} required>
-            <SelectTrigger id="status">
+            <SelectTrigger id="status" className="w-40">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

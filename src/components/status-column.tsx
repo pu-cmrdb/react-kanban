@@ -42,8 +42,10 @@ export function StatusColumn({ title, status, ...props }: StatusColumnProps) {
           個
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {children}
+      <CardContent>
+        <div className="space-y-4">
+          {children}
+        </div>
       </CardContent>
     </Card>
   );

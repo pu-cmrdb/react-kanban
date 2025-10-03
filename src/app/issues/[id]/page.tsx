@@ -58,7 +58,7 @@ export default function IssuePage() {
 
   // 直接顯示議題的完整資訊，不需要檢查 issue 是否存在
   return (
-    <div className="w-3xl mx-auto p-16 space-y-4">
+    <div className="mx-auto w-3xl space-y-4 p-16">
       {/* 標題和返回按鈕 */}
       <h1 className="relative flex items-center gap-2 text-3xl font-bold">
         <BackButton href="/" className="absolute -left-4 -translate-x-full" />
@@ -71,7 +71,7 @@ export default function IssuePage() {
       </div>
 
       {/* 詳細描述 */}
-      <p className="text-muted-foreground text-lg">{issue.description}</p>
+      <p className="text-lg text-muted-foreground">{issue.description}</p>
 
       {/* 操作按鈕區 */}
       <div className="flex gap-2">
