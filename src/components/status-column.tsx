@@ -3,9 +3,8 @@
 import { useMemo } from 'react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-import { IssueCard } from './issue-card';
-import { useIssue } from './providers/issue';
+import { IssueCard } from '@/components/issue-card';
+import { useIssue } from '@/components/providers/issue';
 
 interface StatusColumnProps extends React.ComponentProps<typeof Card> {
   title: string;

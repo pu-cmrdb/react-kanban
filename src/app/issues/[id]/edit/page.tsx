@@ -1,10 +1,11 @@
 /**
- * 建立新議題頁面
+ * 編輯議題頁面
  *
- * 這個頁面展示了如何使用 React 的表單處理和狀態管理：
- * - 使用 useState 管理表單欄位的值
- * - 使用 useIssue 取得全域的 createIssue 方法
- * - 使用 onSubmit 處理表單提交事件
+ * 這個頁面展示了如何編輯現有議題：
+ * - 使用 useIssueDetail 取得當前議題資料和 patchIssue 方法
+ * - 使用 useState 管理表單欄位，初始值為現有議題的資料
+ * - 使用 try-catch 處理更新時可能發生的錯誤
+ * - 更新成功後導航回議題詳細頁
  */
 
 'use client';
@@ -21,21 +22,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { StatusBadge } from '@/components/status-badge';
 import { Textarea } from '@/components/ui/textarea';
-import { useIssue } from '@/components/providers/issue';
+import { useIssueDetail } from '@/components/providers/issue-detail';
 
-export default function CreateIssuePage() {
-  // 從全域 IssueProvider 取得 createIssue 方法
-  // 這個方法會自動呼叫 API 並更新全域狀態
-  const { createIssue } = useIssue();
+export default function IssueEditPage() {
+  // 從 IssueDetailProvider 取得當前議題資料和 patchIssue 方法
+  // issue 保證存在（因為 layout.tsx 使用了提前返回模式）
+  // patchIssue 是包裝過的方法，不需要傳入 id 參數
+  const { issue, patchIssue } = useIssueDetail();
 
   // Next.js 的路由 hook，用來程式化導航（跳轉頁面）
   const router = useRouter();
 
   // 使用 useState 管理表單的三個欄位
-  // 每個欄位都需要一個獨立的 state，這樣才能追蹤使用者的輸入
-  const [title, setTitle] = useState('');
-  const [status, setStatus] = useState('');
-  const [description, setDescription] = useState('');
+  // 💡 注意：這裡的初始值是現有議題的資料，而不是空字串
+  // 這樣使用者打開編輯頁面時，表單會預先填入現有的資料
+  const [title, setTitle] = useState(issue.title);
+  const [status, setStatus] = useState(issue.status);
+  const [description, setDescription] = useState(issue.description);
 
   // 錯誤狀態：用來儲存和顯示 API 錯誤訊息
   // null 表示沒有錯誤，string 表示有錯誤訊息要顯示
@@ -52,26 +55,22 @@ export default function CreateIssuePage() {
     setError(null);
 
     try {
-      // 呼叫全域的 createIssue 方法，建立新議題
+      // 呼叫 IssueDetailProvider 提供的 patchIssue 方法
       // 這個方法會：
-      // 1. 呼叫 POST /api/issues API
-      // 2. 自動呼叫 refresh() 更新全域狀態
-      // 3. 返回新建立的議題物件（包含自動產生的 id）
-      await createIssue({
-        title,
-        status,
-        description,
-      });
+      // 1. 自動帶入 issue.id，呼叫全域 IssueProvider.patchIssue(issue.id, updates)
+      // 2. 內部呼叫 PATCH /api/issues/[id] API
+      // 3. 自動呼叫 refresh() 更新全域狀態
+      await patchIssue({ title, status, description });
 
-      // 建立完成後，導航回首頁看板
+      // 更新完成後，導航回議題詳細頁
       // router.push() 會在客戶端進行頁面切換，不會重新載入整個頁面
-      // 因為 createIssue 已經自動呼叫 refresh()，首頁會立即顯示新建立的議題
-      router.push('/');
+      // 因為 patchIssue 已經自動呼叫 refresh()，詳細頁會顯示最新的資料
+      router.push(`/issues/${issue.id}`);
     }
     catch (err) {
       // 如果 API 呼叫失敗，捕捉錯誤並顯示給使用者
       // err 可能是任何型別，所以需要安全地轉換成字串
-      const errorMessage = err instanceof Error ? err.message : '建立議題時發生未知錯誤';
+      const errorMessage = err instanceof Error ? err.message : '更新議題時發生未知錯誤';
       setError(errorMessage);
     }
   };
@@ -80,8 +79,8 @@ export default function CreateIssuePage() {
     <div className="w-3xl mx-auto p-16 space-y-8">
       {/* 標題和返回按鈕 */}
       <h1 className="relative flex items-center gap-2 text-3xl font-bold">
-        <BackButton href="/" className="absolute -left-4 -translate-x-full" />
-        <span>建立新議題</span>
+        <BackButton href={`/issues/${issue.id}`} className="absolute -left-4 -translate-x-full" />
+        <span>編輯議題</span>
       </h1>
 
       {/* 錯誤訊息顯示區域 */}
@@ -102,13 +101,13 @@ export default function CreateIssuePage() {
           <Input
             id="title"
             type="text"
-            value={title}
-            onInput={(e) => setTitle(e.currentTarget.value)}
-            required
+            value={title} // 綁定到 state，初始值為 issue.title
+            onInput={(e) => setTitle(e.currentTarget.value)} // 更新 state
+            required // HTML5 原生驗證：必填欄位
           />
         </div>
 
-        {/* 狀態選擇器 */}
+        {/* 狀態欄位 */}
         <div className="space-y-2">
           <Label htmlFor="status">狀態*</Label>
           {/* Select 是 shadcn/ui 提供的下拉選單元件 */}
@@ -131,15 +130,15 @@ export default function CreateIssuePage() {
           <Label htmlFor="description">敘述*</Label>
           <Textarea
             id="description"
-            value={description}
-            onInput={(e) => setDescription(e.currentTarget.value)}
-            required
+            value={description} // 綁定到 state，初始值為 issue.description
+            onInput={(e) => setDescription(e.currentTarget.value)} // 更新 state
+            required // HTML5 原生驗證：必填欄位
           />
         </div>
 
         {/* 提交按鈕 */}
         {/* type="submit" 會觸發 form 的 onSubmit 事件 */}
-        <Button type="submit">建立</Button>
+        <Button type="submit">更新</Button>
       </form>
     </div>
   );

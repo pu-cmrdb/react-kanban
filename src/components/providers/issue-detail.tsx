@@ -27,7 +27,7 @@
 import { createContext, useCallback, useContext } from 'react';
 
 import { Issue } from '@/types/issue';
-import { useIssue } from './issue';
+import { useIssue } from '@/components/providers/issue';
 
 /**
  * 定義 Context 提供的資料和方法

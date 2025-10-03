@@ -103,6 +103,9 @@ export function IssueProvider({
    * 3. 呼叫 API 取得資料
    * 4. 把資料存到 state 裡
    * 5. 設定載入狀態為 false（隱藏載入中的畫面）
+   *
+   * 💡 錯誤處理：
+   * 如果 API 回應錯誤，會拋出包含伺服器錯誤訊息的 Error，讓呼叫端可以捕捉並顯示給使用者。
    */
   const refresh = useCallback(async () => {
     // 如果正在載入中，就不要重複執行
@@ -117,7 +120,11 @@ export function IssueProvider({
 
       // 檢查回應是否正常
       if (!response.ok) {
-        throw new Error('載入議題失敗');
+        // 嘗試從回應中取得錯誤訊息
+        // 如果回應不是 JSON 格式，就使用預設訊息
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.error || `載入議題失敗 (HTTP ${response.status})`;
+        throw new Error(errorMessage);
       }
 
       // 解析 JSON 資料
@@ -127,8 +134,10 @@ export function IssueProvider({
       setIssues(data);
     }
     catch (error) {
-      // 如果發生錯誤，在 console 顯示錯誤訊息
+      // 如果發生錯誤，在 console 顯示錯誤訊息並重新拋出
+      // 這樣呼叫端（例如頁面元件）可以捕捉並顯示錯誤給使用者
       console.error('載入議題時發生錯誤：', error);
+      throw error;
     }
     finally {
       // 不管成功或失敗，最後都要把載入狀態設回 false
@@ -142,7 +151,11 @@ export function IssueProvider({
    * 這個方法會建立一個新的議題，ID 會由後端自動產生。
    * 成功後會自動 refresh() 更新全域清單。
    *
-   * 使用方式：
+   * 💡 錯誤處理：
+   * 如果建立失敗，會拋出包含伺服器錯誤訊息的 Error。
+   * 呼叫端應該用 try-catch 捕捉並顯示錯誤給使用者。
+   *
+   * @example 使用方式：
    * ```tsx
    * const newIssue = await createIssue({
    *   title: '新議題',
@@ -153,6 +166,7 @@ export function IssueProvider({
    *
    * @param issue - 新議題的資料（不包含 id）
    * @returns 建立完成的議題（包含 id）
+   * @throws {Error} 如果正在執行其他操作或 API 呼叫失敗
    */
   const createIssue = useCallback(
     async (issue: Omit<Issue, 'id'>): Promise<Issue> => {
@@ -169,7 +183,10 @@ export function IssueProvider({
         });
 
         if (!response.ok) {
-          throw new Error('建立議題失敗');
+          // 嘗試從回應中取得錯誤訊息
+          const errorData = await response.json().catch(() => null);
+          const errorMessage = errorData?.error || `建立議題失敗 (HTTP ${response.status})`;
+          throw new Error(errorMessage);
         }
 
         // 取得新建立的議題
@@ -181,6 +198,7 @@ export function IssueProvider({
         return newIssue;
       }
       catch (error) {
+        // 顯示錯誤訊息並重新拋出，讓呼叫端可以處理
         console.error('建立議題時發生錯誤：', error);
         throw error;
       }
@@ -204,13 +222,18 @@ export function IssueProvider({
    * 💡 在其他地方使用時：
    * 可以直接傳入 id 來更新任何議題，例如在看板上拖拽時更新狀態。
    *
-   * 使用方式：
+   * 💡 錯誤處理：
+   * 如果更新失敗，會拋出包含伺服器錯誤訊息的 Error。
+   * 呼叫端應該用 try-catch 捕捉並顯示錯誤給使用者。
+   *
+   * @example 使用方式：
    * ```tsx
    * await patchIssue('issue-123', { status: 'done' });
    * ```
    *
    * @param id - 要更新的議題 ID
    * @param updates - 要更新的欄位
+   * @throws {Error} 如果 API 呼叫失敗
    */
   const patchIssue = useCallback(
     async (id: string, updates: Partial<Omit<Issue, 'id'>>): Promise<void> => {
@@ -227,13 +250,17 @@ export function IssueProvider({
         });
 
         if (!response.ok) {
-          throw new Error('更新議題失敗');
+          // 嘗試從回應中取得錯誤訊息
+          const errorData = await response.json().catch(() => null);
+          const errorMessage = errorData?.error || `更新議題失敗 (HTTP ${response.status})`;
+          throw new Error(errorMessage);
         }
 
         // 重新載入全域清單
         await refresh();
       }
       catch (error) {
+        // 顯示錯誤訊息並重新拋出，讓呼叫端可以處理
         console.error('更新議題時發生錯誤：', error);
         throw error;
       }
@@ -257,13 +284,18 @@ export function IssueProvider({
    * 💡 刪除後記得導向其他頁面：
    * 刪除成功後，當前頁面的議題已經不存在了，要記得導向到首頁或其他頁面。
    *
-   * 使用方式：
+   * 💡 錯誤處理：
+   * 如果刪除失敗，會拋出包含伺服器錯誤訊息的 Error。
+   * 呼叫端應該用 try-catch 捕捉並顯示錯誤給使用者。
+   *
+   * @example 使用方式：
    * ```tsx
    * await deleteIssue('issue-123');
-   * router.push('/');
+   * router.replace('/');
    * ```
    *
    * @param id - 要刪除的議題 ID
+   * @throws {Error} 如果 API 呼叫失敗
    */
   const deleteIssue = useCallback(
     async (id: string): Promise<void> => {
@@ -278,13 +310,17 @@ export function IssueProvider({
         });
 
         if (!response.ok) {
-          throw new Error('刪除議題失敗');
+          // 嘗試從回應中取得錯誤訊息
+          const errorData = await response.json().catch(() => null);
+          const errorMessage = errorData?.error || `刪除議題失敗 (HTTP ${response.status})`;
+          throw new Error(errorMessage);
         }
 
         // 重新載入全域清單
         await refresh();
       }
       catch (error) {
+        // 顯示錯誤訊息並重新拋出，讓呼叫端可以處理
         console.error('刪除議題時發生錯誤：', error);
         throw error;
       }

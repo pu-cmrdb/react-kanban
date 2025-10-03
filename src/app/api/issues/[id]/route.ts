@@ -27,18 +27,15 @@ export async function PUT(request: NextRequest, context: RouteContext<'/api/issu
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export async function PATCH(request: NextRequest, context: RouteContext<'/api/issues/[id]'>) {
+  const { id } = await context.params;
+
   try {
     validateJsonRequest(request);
 
     const body = await request.json();
 
-    if (!('id' in body) || typeof body.id !== 'string') {
-      throw new Error('缺少議題 ID');
-    }
-
-    const { id, ...partialData } = body;
-    const updatedIssue = storage.patch(id, partialData);
+    const updatedIssue = storage.patch(id, body);
 
     if (!updatedIssue) throw new Error('議題不存在');
 
@@ -53,17 +50,11 @@ export async function PATCH(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(request: NextRequest, context: RouteContext<'/api/issues/[id]'>) {
+  const { id } = await context.params;
+
   try {
-    validateJsonRequest(request);
-
-    const body = await request.json();
-
-    if (!('id' in body) || typeof body.id !== 'number') {
-      throw new Error('缺少議題 ID');
-    }
-
-    const deleted = storage.delete(body.id);
+    const deleted = storage.delete(id);
 
     if (!deleted) throw new Error('議題不存在');
 
